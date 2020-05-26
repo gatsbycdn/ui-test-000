@@ -33,7 +33,7 @@ function useConfigStatus() {
 
   async function fetchConfig() {
     const client = new Apolloclient({
-      uri: 'http://localhost:4000'
+      uri: 'http://192.168.10.2:4000'
     })
     
     client
@@ -59,7 +59,7 @@ function useConfigStatus() {
   async function deleteConfig(id) {
     console.log(id)
     const client = new Apolloclient({
-      uri: 'http://localhost:4000'
+      uri: 'http://192.168.10.2:4000'
     })
     
     await client
@@ -74,7 +74,7 @@ function useConfigStatus() {
 
   async function updateConfigs() {
     const client = new Apolloclient({
-      uri: 'http://localhost:4000'
+      uri: 'http://192.168.10.2:4000'
     })
     
     await client
