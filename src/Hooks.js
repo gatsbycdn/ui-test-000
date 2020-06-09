@@ -135,20 +135,20 @@ function useConfigStatus() {
   }
 
   async function deleteRecord(id) {
-    console.log(`The dns record of [${id}] will be removed`)
-    const apiURL = `https://api.cloudflare.com/client/v4/zones/{dns_zone_id}/dns_records/${id}`
-    const headers = {'Authorization': 'Bearer Fpi4Tw5xYBDAjlN1zF-HNkXPiaEtTJfhdWVUB34Z',
-    'Content-Type': 'application/json'}
-    await fetch(apiURL, {
-      method: 'DELETE',
-      headers: headers,
-    }).then((res) => {
-      if(res.ok) {
-        fetchAlienIp()
-        fetchEarthIp()
-        fetchUsingAdd()
-      }
+    const apolloApiURL = process.env.REACT_APP_APOLLO_API;
+    console.log(id)
+    const client = new Apolloclient({
+      uri: apolloApiURL
     })
+    
+    await client
+      .mutate({
+        mutation: gql`
+        mutation {
+          removeDNSRecord(id:"${id}")
+        }`
+      })
+    await deleteConfig(id)
   }
 
   useEffect(() => {
@@ -274,6 +274,12 @@ function useConfigStatus() {
         <span role="img" aria-label="fireworks"
           onClick={() => updateConfigs()}>
           🎆
+        </span>
+      </div>
+      <div style={ipBarStyle}>
+        <span role="img" aria-label="plus"
+          onClick={() => updateConfigs()}>
+          ➕
         </span>
       </div>
     </div>
