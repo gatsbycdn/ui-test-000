@@ -1,16 +1,24 @@
+import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
 import Apolloclient from 'apollo-boost';
 import { gql } from 'apollo-boost';
+import fetch from 'node-fetch';
 
 function useConfigStatus() {
+
+  dotenv.config()
+
   const[vmessJson, setVmessJson] = useState([])
   const[usingAdd, setUsingAdd] = useState(null)
   const [ipAddressAlien, setAlienIp] = useState(null)
   const [ipAddressEarth, setEarthIp] = useState(null)
   const [clickedId, setClick] = useState(null)
 
-  async function fetchAlienIp() { 
-    await fetch('http://192.168.10.2/digapi.php', {method: 'get',})
+  async function fetchAlienIp() {
+    
+    console.log(process.env.REACT_APP_T)
+    const digApiURL = process.env.REACT_APP_DIG_API_URL;
+    await fetch(digApiURL, {method: 'get',})
     .then((res) => res.text())
     .then( data => setAlienIp(data))
   }
@@ -108,6 +116,7 @@ function useConfigStatus() {
     }).then((res) => {
       if(res.ok) {
         fetchAlienIp()
+        fetchEarthIp()
         fetchUsingAdd()
       }
     })
@@ -116,6 +125,23 @@ function useConfigStatus() {
   async function clickOption(vmessObj) {
     console.log(`The link of [${vmessObj['id']}] got clicked.`)
     setClick(vmessObj['id'])
+  }
+
+  async function deleteRecord(id) {
+    console.log(`The dns record of [${id}] will be removed`)
+    const apiURL = `https://api.cloudflare.com/client/v4/zones/{dns_zone_id}/dns_records/${id}`
+    const headers = {'Authorization': 'Bearer Fpi4Tw5xYBDAjlN1zF-HNkXPiaEtTJfhdWVUB34Z',
+    'Content-Type': 'application/json'}
+    await fetch(apiURL, {
+      method: 'DELETE',
+      headers: headers,
+    }).then((res) => {
+      if(res.ok) {
+        fetchAlienIp()
+        fetchEarthIp()
+        fetchUsingAdd()
+      }
+    })
   }
 
   useEffect(() => {
@@ -190,7 +216,7 @@ function useConfigStatus() {
     backgroundColor: "white",
     float: "right",
     right: 0,
-    width: "20%",
+    width: "10%",
     textAlign: "center"
   }
 
@@ -199,8 +225,15 @@ function useConfigStatus() {
     .map((obj) => 
       <div className='col-sm-4' key={obj['id']}>
         <div style={boxStyle}>
+          <div onClick={() => deleteConfig(obj['id'])} style={placeHolderRightStyle}>
+            <span role="img" aria-label="collision">💥</span>
+          </div>
           <div onClick={() => clickOption(obj)} style={placeHolderLeftStyle}>
-            {((obj['id']===clickedId) ? <div onClick={() => deleteConfig(obj['id'])}><span role="img" aria-label="collision">💥</span></div> : obj['ps'])}
+            {((obj['id']===clickedId) ? 
+            <div onClick={() => deleteRecord(obj['id'])}>
+              <span role="img" aria-label="removal">☹</span>
+            </div> 
+            : obj['ps'])}
           </div>
           <div onClick={() => switchConfig(obj)} style={placeHolderRightStyle}><span role="img" aria-label="rocket">🚀</span></div>
         </div>
