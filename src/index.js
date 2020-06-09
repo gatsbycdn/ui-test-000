@@ -5,9 +5,9 @@ import * as serviceWorker from './serviceWorker';
 import 'bootstrap/dist/css/bootstrap.css';
 import { ApolloProvider } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
-import dotenv from 'dotenv';
+//import dotenv from 'dotenv';
 
-dotenv.config()
+//dotenv.config()
 
 const client = new ApolloClient({
   uri: 'http://192.168.10.2:4000'

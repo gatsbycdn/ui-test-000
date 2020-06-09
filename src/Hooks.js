@@ -15,22 +15,25 @@ function useConfigStatus() {
   const [clickedId, setClick] = useState(null)
 
   async function fetchAlienIp() {
-    
-    console.log(process.env.REACT_APP_T)
+    console.log(process.env.REACT_APP_DIG_API_URL)
     const digApiURL = process.env.REACT_APP_DIG_API_URL;
     await fetch(digApiURL, {method: 'get',})
     .then((res) => res.text())
     .then( data => setAlienIp(data))
   }
 
-  async function fetchEarthIp() { 
-    await fetch('http://192.168.10.2/sohuapi.php', {method: 'get',})
+  async function fetchEarthIp() {
+    console.log(process.env.REACT_APP_SOHU_API_URL)
+    const sohuApiURL = process.env.REACT_APP_SOHU_API_URL; 
+    await fetch(sohuApiURL, {method: 'get',})
     .then((res) => res.text())
     .then( data => setEarthIp(data))
   }
 
   async function fetchUsingAdd() {
-    await fetch('http://192.168.10.2/api.php', {method: 'get',})
+    console.log(process.env.REACT_APP_LOCAL_API_URL)
+    const apiURL = process.env.REACT_APP_LOCAL_API_URL; 
+    await fetch(apiURL, {method: 'get',})
       .then((response) => {
         return response.text();
       })
@@ -40,8 +43,9 @@ function useConfigStatus() {
   }
 
   async function fetchConfig() {
+    const apolloApiURL = process.env.REACT_APP_APOLLO_API;
     const client = new Apolloclient({
-      uri: 'http://192.168.10.2:4000'
+      uri: apolloApiURL
     })
     
     client
@@ -65,9 +69,10 @@ function useConfigStatus() {
   }
 
   async function deleteConfig(id) {
+    const apolloApiURL = process.env.REACT_APP_APOLLO_API;
     console.log(id)
     const client = new Apolloclient({
-      uri: 'http://192.168.10.2:4000'
+      uri: apolloApiURL
     })
     
     await client
@@ -81,8 +86,9 @@ function useConfigStatus() {
   }
 
   async function updateConfigs() {
+    const apolloApiURL = process.env.REACT_APP_APOLLO_API;
     const client = new Apolloclient({
-      uri: 'http://192.168.10.2:4000'
+      uri: apolloApiURL
     })
     
     await client
@@ -95,7 +101,6 @@ function useConfigStatus() {
         }`
       })
     setClick(null)
-    
     fetchConfig()
   }
 
@@ -106,7 +111,9 @@ function useConfigStatus() {
     setClick(vmessObj['id'])
     setVmessJson(newVmessJson)
     console.log(vmessJson)
-    await fetch('http://192.168.10.2/switchConfigTest.php', {
+    console.log(process.env.REACT_APP_SWITCH_API_URL)
+    const switchApiURL = process.env.REACT_APP_SWITCH_API_URL; 
+    await fetch(switchApiURL, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
