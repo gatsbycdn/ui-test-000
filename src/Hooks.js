@@ -9,28 +9,33 @@ function useConfigStatus() {
   dotenv.config()
 
   const[vmessJson, setVmessJson] = useState([])
-  const[usingAdd, setUsingAdd] = useState(null)
-  const [ipAddressAlien, setAlienIp] = useState(null)
+  const[usingAdd, setUsingAdd] = useState('')
+  const [ipAddressAlien, setAlienIp] = useState('')
   const [ipAddressEarth, setEarthIp] = useState(null)
   const [clickedId, setClick] = useState(null)
+  const [siteName, setSiteName] = useState('')
+  const [siteIp, setSiteIp] = useState('')
 
-  async function fetchAlienIp() {
-    console.log(process.env.REACT_APP_DIG_API_URL)
-    const digApiURL = process.env.REACT_APP_DIG_API_URL;
-    await fetch(digApiURL, {method: 'get',})
-    .then((res) => res.text())
-    .then( data => setAlienIp(data))
+  async function fetchUsingAdd(ip) {
+    const apolloApiURL = process.env.REACT_APP_APOLLO_API;
+    const client = new Apolloclient({
+      uri: apolloApiURL
+    })
+    
+    client
+      .query({
+        query: gql`
+        {
+          getConfig(ip:"${ip}") {
+            name
+          }
+        }`
+      })
+      .then(res => res.data.getConfig)
+      .then(res => setUsingAdd(res.name))
   }
 
-  async function fetchEarthIp() {
-    console.log(process.env.REACT_APP_SOHU_API_URL)
-    const sohuApiURL = process.env.REACT_APP_SOHU_API_URL; 
-    await fetch(sohuApiURL, {method: 'get',})
-    .then((res) => res.text())
-    .then( data => setEarthIp(data))
-  }
-
-  async function fetchUsingAdd() {
+  /**async function fetchUsingAdd() {
     console.log(process.env.REACT_APP_LOCAL_API_URL)
     const apiURL = process.env.REACT_APP_LOCAL_API_URL; 
     await fetch(apiURL, {method: 'get',})
@@ -40,7 +45,7 @@ function useConfigStatus() {
       .then(data =>  
         setUsingAdd(data)
       )
-  }
+  }**/
 
   async function fetchConfig() {
     const apolloApiURL = process.env.REACT_APP_APOLLO_API;
@@ -65,7 +70,9 @@ function useConfigStatus() {
         }`
       })
       .then(data => data.data.listConfig)
-      .then(data => setVmessJson(Array.from(data)))
+      .then(data => {
+        setVmessJson(Array.from(data))
+      })
   }
 
   async function deleteConfig(id) {
@@ -95,9 +102,7 @@ function useConfigStatus() {
       .mutate({
         mutation: gql`
         mutation {
-          updateConfig {
-            id
-          }
+          updateConfig
         }`
       })
     setClick(null)
@@ -108,7 +113,7 @@ function useConfigStatus() {
     console.log(`The link of [${vmessObj['id']}] got clicked.`)
     let prototypeJson = vmessJson
     let newVmessJson = prototypeJson.filter(obj => obj!==vmessObj)
-    setClick(vmessObj['id'])
+    //setClick(vmessObj['id'])
     setVmessJson(newVmessJson)
     console.log(vmessJson)
     console.log(process.env.REACT_APP_SWITCH_API_URL)
@@ -122,9 +127,7 @@ function useConfigStatus() {
       body: JSON.stringify(vmessObj) ,
     }).then((res) => {
       if(res.ok) {
-        fetchAlienIp()
-        fetchEarthIp()
-        fetchUsingAdd()
+        setClick('update')
       }
     })
   }
@@ -151,11 +154,80 @@ function useConfigStatus() {
     await deleteConfig(id)
   }
 
+  async function addDNSRecord(ps,ip) {
+    const apolloApiURL = process.env.REACT_APP_APOLLO_API;
+    console.log(ps + ip)
+    const client = new Apolloclient({
+      uri: apolloApiURL
+    })
+    
+    await client
+      .mutate({
+        mutation: gql`
+        mutation {
+          addDNSRecord(ps:"${ps}",ip:"${ip}")
+        }`
+      }).then((res) => {
+        if(res.ok) {
+          fetchConfig()
+          setClick(null)
+        }
+      })
+  }
+
+  function promptConfig () {
+    console.log('add clicked')
+    setClick('addConfig')
+  }
+
   useEffect(() => {
-    fetchUsingAdd()
-    fetchAlienIp()
-    fetchEarthIp()
     fetchConfig()
+    async function fetchEarthIp() {
+      const apolloApiURL = process.env.REACT_APP_APOLLO_API;
+      const client = new Apolloclient({
+        uri: apolloApiURL
+      })
+      
+      client
+        .query({
+          query: gql`
+          {
+            getEarthIp {
+              cip
+              cid
+              cname
+            }
+          }`
+        })
+        .then(res => res.data.getEarthIp)
+        .then(res => setEarthIp(res.cip))
+    }
+  
+    async function fetchAlienIp() {
+      const apolloApiURL = process.env.REACT_APP_APOLLO_API;
+      const client = new Apolloclient({
+        uri: apolloApiURL
+      })
+      
+      client
+        .query({
+          query: gql`
+          {
+            getAlienIp {
+              ip
+            }
+          }`
+        })
+        .then(res => res.data.getAlienIp)
+        .then(res => {
+          setAlienIp(res.ip)
+          fetchUsingAdd(res.ip)
+        })
+    }
+    fetchEarthIp()
+    fetchAlienIp()
+
+  
   }, [clickedId])
 
   const boxStyle = {
@@ -200,6 +272,7 @@ function useConfigStatus() {
   const pStyle = {
     top: "50%",
     left: "50%",
+    textAlign: "center",
     margin: 5
   }
 
@@ -208,6 +281,7 @@ function useConfigStatus() {
     left: "50%",
     margin: 5,
     color: "black",
+    textAlign: "center",
     textDecoration: "none"
   }
 
@@ -227,6 +301,14 @@ function useConfigStatus() {
     textAlign: "center"
   }
 
+  const placeHolderCenterStyle = {
+    backgroundColor: "white",
+    float: "center",
+    right: 0,
+    width: "100%",
+    textAlign: "center"
+  }
+
   const listItems = Array.from(vmessJson)
     .filter(obj => obj['address']!==usingAdd)
     .map((obj) => 
@@ -238,7 +320,7 @@ function useConfigStatus() {
           <div onClick={() => clickOption(obj)} style={placeHolderLeftStyle}>
             {((obj['id']===clickedId) ? 
             <div onClick={() => deleteRecord(obj['id'])}>
-              <span role="img" aria-label="removal">☹</span>
+              <span role="img" aria-label="removal">❌</span>
             </div> 
             : obj['ps'])}
           </div>
@@ -267,6 +349,26 @@ function useConfigStatus() {
       <div className="container-fluid">
         <div className="row">
         {listItems}
+        <div className='col-sm-4' key='addConfig'>
+        <div style={boxStyle}>
+          <div style={placeHolderCenterStyle}>
+            {(('addConfig'===clickedId) ? 
+            <div onClick={() => console.log('clicked')}>
+              <form onSubmit={() => addDNSRecord(siteName,siteIp)}>
+                <label>
+                  <input type="text" placeholder="Name" onChange={e => setSiteName(e.target.value)} />
+                </label>
+                <label>
+                  <input type="text" placeholder="IP" onChange={e => setSiteIp(e.target.value)} />
+                </label>
+                <div>
+                <input type="submit" value="+" onClick={console.log('Submit Clicked')} /></div>
+              </form>
+            </div> 
+            : <span role="img" aria-label="plus" onClick={() => promptConfig()}>➕</span>)}
+          </div>
+        </div>
+      </div>
         </div>
       </div>
       <br></br>
@@ -274,12 +376,6 @@ function useConfigStatus() {
         <span role="img" aria-label="fireworks"
           onClick={() => updateConfigs()}>
           🎆
-        </span>
-      </div>
-      <div style={ipBarStyle}>
-        <span role="img" aria-label="plus"
-          onClick={() => updateConfigs()}>
-          ➕
         </span>
       </div>
     </div>
