@@ -4,7 +4,7 @@ import Apolloclient from 'apollo-boost';
 import { gql } from 'apollo-boost';
 import fetch from 'node-fetch';
 
-function useConfigStatus() {
+function UseConfigStatus() {
 
   dotenv.config()
 
@@ -382,4 +382,4 @@ function useConfigStatus() {
   )
 }
 
-export default useConfigStatus
+export default UseConfigStatus

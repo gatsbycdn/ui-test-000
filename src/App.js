@@ -1,10 +1,10 @@
 import React from 'react';
-import useConfigStatus from './Hooks'
+import UseConfigStatus from './Hooks'
 
 function App() {
   return (
     <div>
-    {useConfigStatus()}
+    {UseConfigStatus()}
     </div>
   );
 }
