@@ -4,11 +4,7 @@ import { gql } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import fetch from 'node-fetch';
 
-function App() {
-  dotenv.config()
-  console.log('rendering...')
-
-  const ALL_IN_ONE = gql`
+const ALL_IN_ONE = gql`
   query {
     allInOne {
       localIP {
@@ -18,6 +14,7 @@ function App() {
       }
       proxyIP {
         ip
+        loc
       }
       config {
         name
@@ -41,9 +38,9 @@ function App() {
       }
     }
   }
-  `
+`
 
-  const UPDATE_CONFIG = gql`
+const UPDATE_CONFIG = gql`
   mutation {
     updateConfig {
       id
@@ -53,9 +50,9 @@ function App() {
       proxied
     }
   }
-  `
+`
 
-  const DELETE_CONFIG = gql`
+const DELETE_CONFIG = gql`
   mutation DeleteConfig($id: String) {
     deleteConfig(id: $id) {
       deletedCount
@@ -66,9 +63,9 @@ function App() {
       }
     }
   }
-  `
+`
 
-  const REMOVE_DNS_RECORD = gql`
+const REMOVE_DNS_RECORD = gql`
   mutation RemoveDNSRecord($id: String) {
     removeDNSRecord(id: $id) {
       result {
@@ -85,9 +82,9 @@ function App() {
       }
     }
   }
-  `
+`
 
-  const ADD_DNS_RECORD = gql`
+const ADD_DNS_RECORD = gql`
   mutation AddDNSRecord($ps: String, $ip: String) {
     addDNSRecord(ps: $ps, ip: $ip) {
       result {
@@ -100,11 +97,21 @@ function App() {
       } 
     }
   }
-  
-  `
+`
+
+function App() {
+  dotenv.config()
+  console.log('rendering...')
 
   const { error, loading, data, refetch } = useQuery(ALL_IN_ONE)
-  const [updateConfig] = useMutation(UPDATE_CONFIG)
+  const [
+    updateConfig,
+    // { loading: mutationLoading, error: mutationError }
+  ] = useMutation(UPDATE_CONFIG, {
+    refetchQueries: [{ query: ALL_IN_ONE }],
+    awaitRefetchQueries: true
+  })
+
   const [deleteConfig] = useMutation(DELETE_CONFIG)
   const [removeDNSRecord] = useMutation(REMOVE_DNS_RECORD)
   const [addDNSRecord] = useMutation(ADD_DNS_RECORD)
@@ -126,6 +133,9 @@ function App() {
 
   if (loading) return null;
   if (error) return `Error! ${error}`;
+
+  //if (mutationLoading) return <p>Loading...</p>;
+  //if (mutationError) return <p>Error :(</p>;
 
   async function switchConfig(selectedConfig) {
     console.log(`The link of [${selectedConfig['address']}] got clicked.`)
@@ -149,8 +159,6 @@ function App() {
 
   const config = data.allInOne.config
 
-  //const url = "https://" + config.address + "/speedtest/index.html";
-
   const boxStyle = {
     position: "relative",
     padding: 10,
@@ -173,8 +181,8 @@ function App() {
     border: 2,
     fontFamily: "Arial",
     borderRadius: "1%",
-    
   }
+
   const ipBarStyle = {
     padding: 5,
     backgroundColor: "white",
@@ -184,6 +192,20 @@ function App() {
     textAlign: "center",
     border: "1px",
     fontFamily: "Arial",
+  }
+  const footerStyle = {
+    position: "fixed",
+    left: 0,
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "white",
+    WebkitFilter: "drop-shadow(0px 0px 1px #666)",
+    color: "black",
+    textAlign: "center",
+    border: "1px",
+    padding: 5,
+    fontSize: "1rem"
+    // fontSize: "65%" 
   }
   const pStyle = {
     top: "50%",
@@ -247,10 +269,30 @@ function App() {
         <div style={aStyle}><a href={'https://' + config.address + "/speedtest/index.html"} style={aStyle}>{config.address}</a></div>
       </div>
       <div style={ipBarStyle} className="col-sm-12 col-md">
-        <div style={pStyle}>国外 IP: {dataAll.proxyIP.ip}</div>
+        <div style={pStyle} onClick={() => setClickStatus('checkProxy')}>
+          {(clickStatus==='checkProxy') ? 
+           <span onClick={() => setClickStatus(null)}>
+             LOC: {dataAll.proxyIP.loc}
+           </span>
+           : 
+           <span>
+             Proxy IP: {dataAll.proxyIP.ip} 
+           </span>
+          }
+        </div>
       </div>
       <div style={ipBarStyle} className="col-sm-12 col-md">
-        <div style={pStyle}>国内 IP: {dataAll.localIP.cip}</div>
+      <div style={pStyle} onClick={() => setClickStatus('checkLocal')}>
+          {(clickStatus==='checkLocal') ? 
+           <span onClick={() => setClickStatus(null)}>
+             LOC: {dataAll.localIP.cname}
+           </span>
+           : 
+           <span>
+             Local IP: {dataAll.localIP.cip}
+           </span>
+          }
+        </div>      
       </div>
     </div>
   </div>
@@ -284,12 +326,10 @@ function App() {
       </div>
     </div>)
 
-  const Footer = () => <div style={ipBarStyle}>
+  const Footer = () => <div style={footerStyle}>
     <span role="img" aria-label="fireworks"
       onClick={() => {
         updateConfig()
-        setClickStatus(null)
-        refetch()
       }
       }>
       🎆
@@ -329,6 +369,7 @@ function App() {
     <br></br>
     <Footer />
   </div>
+  
   )
 }
 
