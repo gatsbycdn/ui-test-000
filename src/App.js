@@ -263,10 +263,12 @@ function App() {
     textAlign: "center"
   }
 
+  const configAddress = (config && config.address !== null) ? config.address : 'failed to fetch'
+
   const Banner = () => <div className="container-fluid">
     <div className="row">
       <div style={addBarStyle} className="col-sm-12">
-        <div style={aStyle}><a href={'https://' + config.address + "/speedtest/index.html"} style={aStyle}>{config.address}</a></div>
+        <div style={aStyle}><a href={'https://' + configAddress + "/speedtest/index.html"} style={aStyle}>{configAddress}</a></div>
       </div>
       <div style={ipBarStyle} className="col-sm-12 col-md">
         <div style={pStyle} onClick={() => setClickStatus('checkProxy')}>
