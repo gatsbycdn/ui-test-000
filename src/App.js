@@ -316,8 +316,8 @@ function App() {
         </div>
         <div style={placeHolderRightStyle}
           onClick={() => { 
-            
-            refetch(alterAddress({ variables: { address: obj['address'] }}))
+            alterAddress({ variables: { address: obj['address'] }})
+            setTimeout(refetch,50)
             }
           }>
           <span role="img" aria-label="rocket">🚀</span>
