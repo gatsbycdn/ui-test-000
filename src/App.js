@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
 import { gql } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import fetch from 'node-fetch';
+//import fetch from 'node-fetch';
 
 const ALL_IN_ONE = gql`
   query {
@@ -99,6 +99,16 @@ const ADD_DNS_RECORD = gql`
   }
 `
 
+const ALTER_CONFIG_ADDRESS = gql`
+  mutation AlterConfigAddress($address: String) {
+    alterAddress(address: $address) {
+      address
+      success
+      error
+    }
+  }
+`
+
 function App() {
   dotenv.config()
   console.log('rendering...')
@@ -115,6 +125,7 @@ function App() {
   const [deleteConfig] = useMutation(DELETE_CONFIG)
   const [removeDNSRecord] = useMutation(REMOVE_DNS_RECORD)
   const [addDNSRecord] = useMutation(ADD_DNS_RECORD)
+  const [alterAddress] = useMutation(ALTER_CONFIG_ADDRESS)
 
   const [clickStatus, setClickStatus] = useState(null)
   const [recordName, setRecordName] = useState('')
@@ -137,7 +148,7 @@ function App() {
   //if (mutationLoading) return <p>Loading...</p>;
   //if (mutationError) return <p>Error :(</p>;
 
-  async function switchConfig(selectedConfig) {
+  /*async function switchConfig(selectedConfig) {
     console.log(`The link of [${selectedConfig['address']}] got clicked.`)
     console.log(process.env.REACT_APP_SWITCH_API_URL)
     const switchApiURL = process.env.REACT_APP_SWITCH_API_URL; 
@@ -153,7 +164,7 @@ function App() {
         refetch()
       }
     })
-  }
+  }*/
 
   const dataAll = data.allInOne
 
@@ -324,7 +335,7 @@ function App() {
           </div> 
           : obj['ps'])}
         </div>
-        <div onClick={() => switchConfig(obj)} style={placeHolderRightStyle}><span role="img" aria-label="rocket">🚀</span></div>
+        <div onClick={() => alterAddress({ variables: { address: obj['address'] }})} style={placeHolderRightStyle}><span role="img" aria-label="rocket">🚀</span></div>
       </div>
     </div>)
 
