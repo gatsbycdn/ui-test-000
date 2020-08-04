@@ -335,7 +335,14 @@ function App() {
           </div> 
           : obj['ps'])}
         </div>
-        <div onClick={() => alterAddress({ variables: { address: obj['address'] }})} style={placeHolderRightStyle}><span role="img" aria-label="rocket">🚀</span></div>
+        <div style={placeHolderRightStyle}
+          onClick={() => { 
+            alterAddress({ variables: { address: obj['address'] }})
+            refetch()
+            }
+          }>
+          <span role="img" aria-label="rocket">🚀</span>
+        </div>
       </div>
     </div>)
 
