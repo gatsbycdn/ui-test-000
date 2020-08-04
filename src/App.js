@@ -145,27 +145,6 @@ function App() {
   if (loading) return null;
   if (error) return `Error! ${error}`;
 
-  //if (mutationLoading) return <p>Loading...</p>;
-  //if (mutationError) return <p>Error :(</p>;
-
-  /*async function switchConfig(selectedConfig) {
-    console.log(`The link of [${selectedConfig['address']}] got clicked.`)
-    console.log(process.env.REACT_APP_SWITCH_API_URL)
-    const switchApiURL = process.env.REACT_APP_SWITCH_API_URL; 
-    await fetch(switchApiURL, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(selectedConfig) ,
-    }).then((res) => {
-      if(res.ok) {
-        refetch()
-      }
-    })
-  }*/
-
   const dataAll = data.allInOne
 
   const config = data.allInOne.config
@@ -337,8 +316,8 @@ function App() {
         </div>
         <div style={placeHolderRightStyle}
           onClick={() => { 
-            alterAddress({ variables: { address: obj['address'] }})
-            refetch()
+            
+            refetch(alterAddress({ variables: { address: obj['address'] }}))
             }
           }>
           <span role="img" aria-label="rocket">🚀</span>
@@ -382,10 +361,12 @@ function App() {
                 </div> 
                 : <span role="img" aria-label="plus" onClick={() => setClickStatus('addRecord')}>➕</span>)}
               </div>
+              
           </div>
         </div>
       </div>
     </div>
+    <br></br>
     <br></br>
     <Footer />
   </div>
