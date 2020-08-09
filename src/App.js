@@ -290,6 +290,8 @@ function App() {
   </div>
 
   const ItemList = () => Array.from(dataAll.configElse)
+// to filter private network
+  .filter( obj => isNaN(Number(obj['name'].slice(1,3))) === false )
   .map((obj, index) => 
     <div className='col-sm-4' key={(obj['id']) || index }>
       <div style={boxStyle}>
@@ -351,6 +353,7 @@ function App() {
                   <form onSubmit={() => {
                     addDNSRecord({ variables: { ps: recordName, ip: recordContent }})
                     updateConfig()
+                    setTimeout(refetch,100)
                     refetch()
                   } }>
                     <input style={placeStyle} type="text" placeholder="Name" onChange={e => setRecordName(e.target.value)} />
@@ -363,6 +366,11 @@ function App() {
               </div>
               
           </div>
+        </div>
+        <div>
+
+
+
         </div>
       </div>
     </div>
