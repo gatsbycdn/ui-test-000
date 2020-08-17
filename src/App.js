@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
 import { gql } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-//import fetch from 'node-fetch';
 
 const ALL_IN_ONE = gql`
   query {
@@ -25,6 +24,7 @@ const ALL_IN_ONE = gql`
         path
         ps
         vid
+        status
       }
       configElse {
         name
@@ -35,6 +35,7 @@ const ALL_IN_ONE = gql`
         path
         ps
         vid
+        status
       }
     }
   }
@@ -314,7 +315,8 @@ function App() {
           }>
             <span role="img" aria-label="removal">❌</span>
           </div> 
-          : obj['ps'])}
+          : obj['ps'].slice(4).split('-').join(' '))} 
+          <span style={placeHolderRightStyle}>{ (obj['status']==='online') ? "🔵" : "🔴"}</span>
         </div>
         <div style={placeHolderRightStyle}
           onClick={() => { 
