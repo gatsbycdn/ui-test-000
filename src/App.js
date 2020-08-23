@@ -129,6 +129,7 @@ function App() {
   const [alterAddress] = useMutation(ALTER_CONFIG_ADDRESS)
 
   const [clickStatus, setClickStatus] = useState(null)
+  const [infoVisibility, setInfoVisibility] = useState(null)
   const [recordName, setRecordName] = useState('')
   const [recordContent, setRecordContent] = useState('')
 
@@ -254,6 +255,8 @@ function App() {
     textAlign: "center"
   }
 
+
+
   const configAddress = (config && config.address !== null) ? config.address : 'failed to fetch'
 
   const Banner = () => <div className="container-fluid">
@@ -298,25 +301,25 @@ function App() {
       <div style={boxStyle}>
         <div onClick={() =>  {
           deleteConfig({ variables: { id: obj['id'] }}) 
-          refetch()
-        }
-      } style={placeHolderRightStyle}>
+          refetch()}} style={placeHolderRightStyle}>
           <span role="img" aria-label="collision">💥</span>
         </div>
         <div onClick={() => setClickStatus(obj['id'])} style={placeHolderLeftStyle}>
           {((clickStatus===obj['id']) ? 
-          <div onClick={() => 
+          <div onClick={() => setInfoVisibility(obj['id'])}>
+            { (infoVisibility === obj['id']) ? <span role="img" aria-label="removal" onClick={() => 
             {
               console.log(obj['id'])
               removeDNSRecord({ variables: { id: obj['id'] }})
               deleteConfig({ variables: { id: obj['id'] }}) 
               refetch()
-            }  
-          }>
-            <span role="img" aria-label="removal">❌</span>
+            }}>❌</span> : <span>{obj['ip']}</span>}
           </div> 
-          : obj['ps'].slice(4).split('-').join(' '))} 
-          <span style={placeHolderRightStyle}>{ (obj['status']==='online') ? "🔵" : "🔴"}</span>
+          : <div><span>{obj['ps'].slice(4).split('-').join(' ')}</span>
+          <span style={placeHolderRightStyle}>{ (obj['status']==='online') ? "🔵" : "🔴"}</span></div>
+          )
+           } 
+          
         </div>
         <div style={placeHolderRightStyle}
           onClick={() => { 
