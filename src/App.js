@@ -315,7 +315,7 @@ function App() {
               refetch()
             }}>❌</span> : <span>{obj['ip']}</span>}
           </div> 
-          : <div><span>{obj['ps'].slice(4).split('-').join(' ')}</span>
+          : <div><span>{obj['ps']}</span>
           <span style={placeHolderRightStyle}>{ (obj['status']==='online') ? "🔵" : "🔴"}</span></div>
           )
            } 
