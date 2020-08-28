@@ -295,7 +295,7 @@ function App() {
 
   const ItemList = () => Array.from(dataAll.configElse)
 // to filter private network
-  .filter( obj => isNaN(Number(obj['name'].slice(1,3))) === false )
+  .filter( obj => isNaN(Number(obj['name'].slice(1,2))) === false )
   .map((obj, index) => 
     <div className='col-sm-4' key={(obj['id']) || index }>
       <div style={boxStyle}>
