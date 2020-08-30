@@ -145,7 +145,18 @@ function App() {
   }, [data])
 
   if (loading) return null;
-  if (error) return `Error! ${error}`;
+  if (error) return (
+    
+    <div
+    onClick={() => { 
+      alterAddress({ variables: { address: 'luochengqi.com' }})
+      setTimeout(refetch,50)
+      }
+    }>
+    <div>`Error! ${error}`</div>
+    <span role="img" aria-label="rocket">🚀</span>
+  </div>
+  );
 
   const dataAll = data.allInOne
 
