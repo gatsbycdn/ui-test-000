@@ -24,7 +24,7 @@ function IPInfo() {
   dotenv.config()
   console.log('rendering...')
 
-  const { error, loading, data } = useQuery(ALL_IN_ONE)
+  const { error, loading, data, refetch } = useQuery(ALL_IN_ONE)
 
   const [clickStatus, setClickStatus] = useState(null)
 
@@ -87,14 +87,14 @@ function IPInfo() {
       case 'remote':
         return <div>
           <Home style={caseLeft} onClick={() => setClickStatus('local')} />
-          <span style={caseCenter} >{dataAll.proxyIP.ip}</span>
+          <span style={caseCenter} onClick={() => refetch()}>{dataAll.proxyIP.ip}</span>
           <Info style={caseRight} onClick={() => setClickStatus('remoteInfo')}/>
         </div>
 
       case 'local':
         return <div>
         <Public style={caseLeft} onClick={() => setClickStatus('remote')} />
-        <span style={caseCenter} >{dataAll.localIP.cip}</span>
+        <span style={caseCenter} onClick={() => refetch()}>{dataAll.localIP.cip}</span>
         <Info style={caseRight} onClick={() => setClickStatus('localInfo')}/>
       </div>
 
