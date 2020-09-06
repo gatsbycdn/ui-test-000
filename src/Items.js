@@ -220,10 +220,7 @@ function Items() {
     textAlign: "center"
   }
 
-
-  const v2Address = dataAll.config.address
-
-
+  const v2Address = (dataAll.config.address) ? dataAll.config.address : null
 
   const banner = (param) => {
     switch(param) {
@@ -270,7 +267,7 @@ function Items() {
       default:
         return <div>
           { (item['status']==='online') ? <CheckCircle style={caseLeft}/> : <Warning style={caseLeft}/> }
-          <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ps']}</span>
+          <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ps'].split('-').slice(-3).join('-')}</span>
           <Launch style={caseRight}
             onClick={() => { 
             alterAddress({ variables: { address: item['address'] }})
