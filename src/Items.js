@@ -219,7 +219,7 @@ function Items() {
     textAlign: "center"
   }
 
-  const v2Address = (dataAll.config.address) ? dataAll.config.address : null
+  const v2Address = dataAll.config.address || null
 
   const banner = (param) => {
     switch(param) {
