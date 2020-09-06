@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+import React from 'react';
+import Bar from './Bar';
 
 const GET_ALIEN_IP = gql`
   {
@@ -10,7 +12,7 @@ const GET_ALIEN_IP = gql`
   }
 `
 
-function useFetchAIP() {
+function FetchRemoteIP() {
   const [aIP, setAIP] = useState('')
   const { loading, error, data } = useQuery(GET_ALIEN_IP)
 
@@ -22,7 +24,9 @@ function useFetchAIP() {
   if (loading) return 'Loading...';
   if (error) return 'Error :(';
 
-  return aIP
+  return (
+    <Bar value={aIP} />
+  )
 }
 
-export default useFetchAIP
+export default FetchRemoteIP

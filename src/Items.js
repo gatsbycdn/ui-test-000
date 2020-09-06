@@ -2,6 +2,13 @@ import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
 import { gql } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
+import { ArrowUpward, AddBox, Delete, ExitToApp, Update, DeleteForever, Flag, MoreVert, Speed, Warning, CheckCircle, Launch, Info } from '@material-ui/icons';
+// import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+/* import Button from '@material-ui/core/Button';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem'; */
+import IconButton from '@material-ui/core/IconButton';
 
 const GET_ITEMS = gql`
   query {
@@ -110,7 +117,7 @@ function Items() {
     updateConfig,
     // { loading: mutationLoading, error: mutationError }
   ] = useMutation(UPDATE_CONFIG, {
-    refetchQueries: [{ query: ALL_IN_ONE }],
+    refetchQueries: [{ query: GET_ITEMS }],
     awaitRefetchQueries: true
   })
 
@@ -120,9 +127,9 @@ function Items() {
   const [alterAddress] = useMutation(ALTER_CONFIG_ADDRESS)
 
   const [clickStatus, setClickStatus] = useState(null)
-  const [infoVisibility, setInfoVisibility] = useState(null)
   const [recordName, setRecordName] = useState('')
   const [recordContent, setRecordContent] = useState('')
+//  const [proxyState, setProxyState] = useState(false)
 
   console.log(data)
 
@@ -151,10 +158,7 @@ function Items() {
 
   const dataAll = data.getItems
 
-  const config = data.getItems.config
-
   const boxStyle = {
-    position: "relative",
     padding: 10,
     margin: 10,
     backgroundColor: "white",
@@ -166,27 +170,7 @@ function Items() {
     borderRadius: "1%",
     display: "flex"
   }
-  const addBarStyle = {
-    padding: 5,
-    backgroundColor: "lavenderblush",
-    color: "black",
-    fontSize: "1rem",
-    textAlign: "center",
-    border: 2,
-    fontFamily: "Arial",
-    borderRadius: "1%",
-  }
 
-  const ipBarStyle = {
-    padding: 5,
-    backgroundColor: "white",
-    WebkitFilter: "drop-shadow(0px 0px 1px #666)",
-    color: "black",
-    fontSize: "1rem",
-    textAlign: "center",
-    border: "1px",
-    fontFamily: "Arial",
-  }
   const footerStyle = {
     position: "fixed",
     left: 0,
@@ -201,136 +185,163 @@ function Items() {
     fontSize: "1rem"
     // fontSize: "65%" 
   }
-  const pStyle = {
-    top: "50%",
-    left: "50%",
-    textAlign: "center",
-    margin: 5
-  }
-  const aStyle = {
-    top: "50%",
-    left: "50%",
-    margin: 5,
-    color: "black",
-    textAlign: "center",
-    textDecoration: "none"
-  }
-  const placeHolderLeftStyle = {
+
+  const caseLeft = {
     backgroundColor: "white",
     float: "left",
     left: 0,
-    width: "80%",
+    width: "10%",
     textAlign: "center"
   }
-  const placeHolderRightStyle = {
+
+  const caseRight = {
     backgroundColor: "white",
     float: "right",
     right: 0,
     width: "10%",
     textAlign: "center"
   }
-  const placeHolderCenterStyle = {
+
+  const caseCenter = {
     backgroundColor: "white",
     float: "center",
-    right: 0,
+    left: 0,
     width: "100%",
+    fontSize: "1rem",
     textAlign: "center"
   }
 
-  const placeStyle = {
+  const phCenter = {
     backgroundColor: "white",
-    float: "left",
-    right: 0,
+    float: "center",
+    left: 0,
     width: "80%",
-    margin: 5,
-    border: "solid 1px",
+    fontSize: "1rem",
     textAlign: "center"
   }
 
-  const buttonStyle = {
-    backgroundColor: "white",
-    float: "right",
-    right: 0,
-    width: "10%",
-    margin: 5,
-    border: "solid 1px",
-    textAlign: "center"
+
+  const v2Address = dataAll.config.address
+
+
+
+  const banner = (param) => {
+    switch(param) {
+      case 'speedtest':
+        return <div style={caseCenter}><a href={'https://' + v2Address + "/speedtest/index.html"}>{v2Address}</a></div>
+
+      case 'ip':
+        return <div>
+          <span style={caseCenter} onClick={() => setClickStatus('topCases')}>{dataAll.config.ip}</span>
+          
+        </div>
+
+      case 'topCases':
+        return <div>
+        <Speed style={caseLeft} onClick={() => window.location.href=('https://' + v2Address + "/speedtest/index.html")} />
+        <span style={caseCenter} onClick={() => setClickStatus('ip')}><Info/></span>
+        <ExitToApp style={caseRight} onClick={() => setClickStatus('address')}/>
+      </div>
+
+      default:
+        return <div>
+          <Flag style={caseLeft} />
+          <span style={caseCenter} >{v2Address}</span>
+          <MoreVert style={caseRight} onClick={() => setClickStatus('topCases')}/>
+        </div>
+    }
+  }
+
+  const itemBar = (item, param) => {
+    switch(param) {
+      case item.id:
+        return <div>
+          <Delete style={caseLeft} onClick={() => {
+            deleteConfig({ variables: { id: item['id'] }})
+            refetch()}}/>
+          <span style={caseCenter} onClick={() => setClickStatus(null)}>{item.ip}</span>
+          <DeleteForever style={caseRight} onClick={() => {
+            console.log(item['id'])
+            removeDNSRecord({ variables: { id: item['id'] }})
+            deleteConfig({ variables: { id: item['id'] }}) 
+            refetch()}}/>
+        </div>
+
+      default:
+        return <div>
+          { (item['status']==='online') ? <CheckCircle style={caseLeft}/> : <Warning style={caseLeft}/> }
+          <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ps']}</span>
+          <Launch style={caseRight}
+            onClick={() => { 
+            alterAddress({ variables: { address: item['address'] }})
+            setTimeout(refetch,50)
+            }
+          }/>
+        </div>
+    }
   }
 
   const ItemList = () => Array.from(dataAll.configElse)
 // to filter private network
   .filter( obj => isNaN(Number(obj['name'].slice(1,2))) === false )
   .map((obj, index) => 
-    <div className='col-sm-4' key={(obj['id']) || index }>
+    <div className='col-md-7' key={(obj['id']) || index }>
       <div style={boxStyle}>
-        <div onClick={() =>  {
-          deleteConfig({ variables: { id: obj['id'] }}) 
-          refetch()}} style={placeHolderRightStyle}>
-          <span role="img" aria-label="collision">💥</span>
-        </div>
-        <div onClick={() => setClickStatus(obj['id'])} style={placeHolderLeftStyle}>
-          {((clickStatus===obj['id']) ? 
-          <div onClick={() => setInfoVisibility(obj['id'])}>
-            { (infoVisibility === obj['id']) ? <span role="img" aria-label="removal" onClick={() => 
-            {
-              console.log(obj['id'])
-              removeDNSRecord({ variables: { id: obj['id'] }})
-              deleteConfig({ variables: { id: obj['id'] }}) 
-              refetch()
-            }}>❌</span> : <span>{obj['ip']}</span>}
-          </div> 
-          : <div><span>{obj['ps']}</span>
-          <span style={placeHolderRightStyle}>{ (obj['status']==='online') ? "🔵" : "🔴"}</span></div>
-          )
-           } 
-          
-        </div>
-        <div style={placeHolderRightStyle}
-          onClick={() => { 
-            alterAddress({ variables: { address: obj['address'] }})
-            setTimeout(refetch,50)
-            }
-          }>
-          <span role="img" aria-label="rocket">🚀</span>
-        </div>
+        {itemBar(obj,clickStatus)}
       </div>
     </div>)
 
   const Footer = () => <div style={footerStyle}>
-    <span role="img" aria-label="fireworks"
-      onClick={() => {
-        updateConfig()
-      }
-      }>
-      🎆
-    </span>
+    <Update  onClick={() => { updateConfig() }}/>
   </div>
+
+/*  const ProxySelector = () => 
+    <Select
+    value={proxyState}
+    onChange={(e) => {
+      setProxyState(e.target.value)
+      console.log(proxyState)
+    }}
+    label="proxied"
+  >
+    <MenuItem value={true}>True</MenuItem>
+    <MenuItem value={false}>False</MenuItem>
+  </Select>
+*/
 
   return (
   
   <div>
-    <br></br>
     <div className="container-fluid">
-        <div className="row">
-        <ItemList />
-        <div className='col-sm-4' key='addRecord'>
+        <div className="row justify-content-md-center">
+        <div className='col-md-7'>
           <div style={boxStyle}>
-              <div style={placeHolderCenterStyle}>
+            <div style={caseCenter}>
+            {banner(clickStatus)}
+            </div>
+          </div>
+        </div>
+        <ItemList />
+        <div className='col-md-7' key='addRecord'>
+          <div style={boxStyle}>
+              <div style={caseCenter}>
                 {(('addRecord'===clickStatus) ? 
                 <div onClick={() => console.log('clicked')}>
-                  <form onSubmit={() => {
+                  <form noValidate autoComplete="off" onSubmit={() => {
                     addDNSRecord({ variables: { ps: recordName, ip: recordContent }})
                     updateConfig()
                     setTimeout(refetch,100)
                     refetch()
                   } }>
-                    <input style={placeStyle} type="text" placeholder="Name" onChange={e => setRecordName(e.target.value)} />
-                    <input style={buttonStyle} type="button" value="-" onClick={() => setClickStatus(null)} />
-                    <input style={placeStyle} type="text" placeholder="IP" onChange={e => setRecordContent(e.target.value)} />
-                    <input style={buttonStyle} type="submit" value="+" onClick={console.log('Submit Clicked')} />
+                    <TextField style={phCenter} margin="dense" size="small" id="filled-basic" label="Name" variant="filled" type="text" placeholder="Name" onChange={e => setRecordName(e.target.value)} />
+                    <TextField style={phCenter} margin="dense" size="small" id="filled-basic" label="IP" variant="filled" type="text" placeholder="IP" onChange={e => setRecordContent(e.target.value)} />      
+                    <br></br>
+                    <IconButton style={phCenter} variant="filled" type="submit" onClick={() => {console.log('Submit Clicked')}} aria-label="arrowupward">
+                      <ArrowUpward/> submit
+                    </IconButton>
                   </form>
                 </div> 
-                : <span role="img" aria-label="plus" onClick={() => setClickStatus('addRecord')}>➕</span>)}
+                : <span onClick={() => setClickStatus('addRecord')}><AddBox/></span>)}
               </div>
               
           </div>

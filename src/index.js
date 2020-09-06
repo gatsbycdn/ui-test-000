@@ -5,7 +5,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { ApolloProvider } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
 import dotenv from 'dotenv';
-import App from './App';
+import Items from './Items';
+import IPInfo from './IPInfo'
 
 dotenv.config()
 
@@ -15,7 +16,8 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <App />
+    <IPInfo />
+    <Items />
   </ApolloProvider>,
   document.getElementById('root')
 );
