@@ -2,16 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import 'bootstrap/dist/css/bootstrap.css';
-import { ApolloProvider } from '@apollo/react-hooks';
-import ApolloClient from 'apollo-boost';
+import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import dotenv from 'dotenv';
 import Items from './Items';
-import IPInfo from './IPInfo'
+import IPInfo from './IPInfo';
 
 dotenv.config()
 
 const client = new ApolloClient({
-  uri: process.env.REACT_APP_APOLLO_API
+  uri: process.env.REACT_APP_APOLLO_API,
+  cache: new InMemoryCache()
 })
 
 ReactDOM.render(

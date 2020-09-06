@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
-import { gql } from 'apollo-boost';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { gql, useQuery, useMutation } from '@apollo/client';
 
 const ALL_IN_ONE = gql`
   query {

@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
-import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, gql} from '@apollo/client';
 import { Home, Public, Info } from '@material-ui/icons';
 
 const ALL_IN_ONE = gql`
@@ -27,6 +26,7 @@ function IPInfo() {
   const { error, loading, data, refetch } = useQuery(ALL_IN_ONE)
 
   const [clickStatus, setClickStatus] = useState(null)
+
 
   console.log(data)
 

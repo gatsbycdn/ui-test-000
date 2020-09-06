@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
-import { gql } from 'apollo-boost';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { gql, useQuery, useMutation } from '@apollo/client'
 import { ArrowUpward, AddBox, Delete, ExitToApp, Update, DeleteForever, Flag, MoreVert, Speed, Warning, CheckCircle, Launch, Info } from '@material-ui/icons';
 // import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
