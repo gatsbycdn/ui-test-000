@@ -110,7 +110,7 @@ function IPInfo() {
       default:
         return <div>
           <Home style={caseLeft} onClick={() => setClickStatus('local')} />
-          <span style={caseCenter} onClick={() => refetch}>{dataAll.proxyIP.ip}</span>
+          <span style={caseCenter} onClick={() => refetch()}>{dataAll.proxyIP.ip}</span>
           <Info style={caseRight} onClick={() => setClickStatus('remoteInfo')}/>
         </div>
     }
