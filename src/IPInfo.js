@@ -119,6 +119,7 @@ function IPInfo() {
 
   return (
     <div className="container-fluid">
+      <br></br>
     <div className="row justify-content-md-center">
       <div className='col-md-7'>
         <div style={boxStyle}>
