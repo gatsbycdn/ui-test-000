@@ -92,7 +92,8 @@ const ADD_DNS_RECORD = gql`
       errors {
         code
         message
-      } 
+      }
+      id 
     }
   }
 `
@@ -137,7 +138,7 @@ function Items() {
   }, [clickStatus]) 
 
   useEffect(() => {
-    if(data && data.getItems)
+    if(data && data.getItems && data.getItems.v2Address)
     setClickStatus(null)
   }, [data])
 
@@ -219,7 +220,7 @@ function Items() {
     textAlign: "center"
   }
 
-  const v2Address = dataAll.config.address || null
+  const v2Address = (dataAll.config && dataAll.config.address) ? dataAll.config.address : `Loading...`
 
   const banner = (param) => {
     switch(param) {
@@ -288,7 +289,9 @@ function Items() {
     </div>)
 
   const Footer = () => <div style={footerStyle}>
-    <Update  onClick={() => { updateConfig() }}/>
+    <Update  onClick={() => { 
+      updateConfig()
+      setClickStatus(null) }}/>
   </div>
 
 /*  const ProxySelector = () => 
@@ -325,15 +328,15 @@ function Items() {
                 <div onClick={() => console.log('clicked')}>
                   <form noValidate autoComplete="off" onSubmit={() => {
                     addDNSRecord({ variables: { ps: recordName, ip: recordContent }})
-                    updateConfig()
-                    setTimeout(refetch,100)
-                    refetch()
+                    //refetch()
+                    setTimeout(refetch,50)
+                    setClickStatus(null)
                   } }>
                     <TextField style={phCenter} margin="dense" size="small" id="filled-basic" label="Name" variant="filled" type="text" placeholder="Name" onChange={e => setRecordName(e.target.value)} />
                     <TextField style={phCenter} margin="dense" size="small" id="filled-basic" label="IP" variant="filled" type="text" placeholder="IP" onChange={e => setRecordContent(e.target.value)} />      
-                    <br></br>
+
                     <IconButton style={phCenter} variant="filled" type="submit" onClick={() => {console.log('Submit Clicked')}} aria-label="arrowupward">
-                      <ArrowUpward/> submit
+                      <ArrowUpward />
                     </IconButton>
                   </form>
                 </div> 
