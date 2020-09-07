@@ -330,7 +330,7 @@ function Items() {
                     addDNSRecord({ variables: { ps: recordName, ip: recordContent }})
                     //refetch()
                     setTimeout(refetch,50)
-                    setClickStatus(null)
+                    //setClickStatus(null)
                   } }>
                     <TextField style={phCenter} margin="dense" size="small" id="filled-basic" label="Name" variant="filled" type="text" placeholder="Name" onChange={e => setRecordName(e.target.value)} />
                     <TextField style={phCenter} margin="dense" size="small" id="filled-basic" label="IP" variant="filled" type="text" placeholder="IP" onChange={e => setRecordContent(e.target.value)} />      
