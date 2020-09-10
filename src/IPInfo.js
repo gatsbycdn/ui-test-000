@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, gql} from '@apollo/client';
 import { Home, Public, Info } from '@material-ui/icons';
 
-const ALL_IN_ONE = gql`
+const IP_INFO = gql`
   query {
-    allInOne {
+    ipInfo {
       localIP {
-        cip
-        cname
-        cid
+        ip
+        loc
+        isp
       }
       proxyIP {
         ip
@@ -23,7 +23,7 @@ function IPInfo() {
   dotenv.config()
   console.log('rendering...')
 
-  const { error, loading, data, refetch } = useQuery(ALL_IN_ONE)
+  const { error, loading, data, refetch } = useQuery(IP_INFO)
 
   const [clickStatus, setClickStatus] = useState(null)
 
@@ -93,7 +93,7 @@ function IPInfo() {
       case 'local':
         return <div>
         <Public style={caseLeft} onClick={() => setClickStatus('remote')} />
-        <span style={caseCenter} onClick={() => refetch()}>{dataAll.localIP.cip}</span>
+        <span style={caseCenter} onClick={() => refetch()}>{dataAll.localIP.ip}</span>
         <Info style={caseRight} onClick={() => setClickStatus('localInfo')}/>
       </div>
 
@@ -104,7 +104,7 @@ function IPInfo() {
 
       case 'localInfo':
         return <div>
-          <span style={caseCenter} onClick={() => setClickStatus('local')}>{dataAll.localIP.cname}</span>
+          <span style={caseCenter} onClick={() => setClickStatus('local')}>{dataAll.localIP.loc + dataAll.localIP.isp}</span>
         </div>
 
       default:
