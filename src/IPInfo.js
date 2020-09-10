@@ -34,14 +34,14 @@ function IPInfo() {
   }, [clickStatus]) 
 
   useEffect(() => {
-    if(data && data.allInOne)
+    if(data && data.ipInfo)
     setClickStatus(null)
   }, [data])
 
   if (loading) return null;
   if (error) return console.log(error);
 
-  const dataAll = data.allInOne
+  const dataAll = data.ipInfo
 
   const boxStyle = {
     padding: 10,
