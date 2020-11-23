@@ -234,7 +234,7 @@ function App() {
     backgroundColor: "white",
     float: "right",
     right: 0,
-    width: "10%",
+    width: "20%",
     textAlign: "center"
   }
   const placeHolderCenterStyle = {

@@ -284,7 +284,9 @@ function Items() {
   .map((obj, index) => 
     <div className='col-md-7' key={(obj['id']) || index }>
       <div style={boxStyle}>
+        <div style={caseCenter}>
         {itemBar(obj,clickStatus)}
+        </div>
       </div>
     </div>)
 
@@ -320,7 +322,10 @@ function Items() {
             </div>
           </div>
         </div>
-        <ItemList />
+
+<ItemList />
+
+        
         <div className='col-md-7' key='addRecord'>
           <div style={boxStyle}>
               <div style={caseCenter}>
