@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client'
-import { ArrowUpward, AddBox, Delete, ExitToApp, Update, DeleteForever, Flag, MoreVert, Speed, Warning, CheckCircle, Launch, Info } from '@material-ui/icons';
+import { ArrowUpward, AddBox, Delete, ExitToApp, Update, DeleteForever, Flag, MoreVert, Speed, Warning, CheckCircle, Launch, Info, Refresh } from '@material-ui/icons';
 // import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 /* import Button from '@material-ui/core/Button';
@@ -108,6 +108,15 @@ const ALTER_CONFIG_ADDRESS = gql`
   }
 `
 
+const UPDATE_STATUS = gql`
+  mutation {
+    updateStatus {
+      success
+      error
+    }
+  }
+`
+
 function Items() {
   dotenv.config()
   console.log('rendering...')
@@ -120,6 +129,15 @@ function Items() {
     refetchQueries: [{ query: GET_ITEMS }],
     awaitRefetchQueries: true
   })
+
+  const [
+    updateStatus,
+    // { loading: mutationLoading, error: mutationError }
+  ] = useMutation(UPDATE_STATUS, {
+    refetchQueries: [{ query: GET_ITEMS }],
+    awaitRefetchQueries: true
+  })
+
 
   const [deleteConfig] = useMutation(DELETE_CONFIG)
   const [removeDNSRecord] = useMutation(REMOVE_DNS_RECORD)
@@ -290,6 +308,14 @@ function Items() {
       </div>
     </div>)
 
+  const RefreshBar = () => <div className='col-md-7' key='updateStatus'>
+    <div style={boxStyle}>
+      <div style={caseCenter}>
+        <Refresh role="img" aria-label="plus" onClick={() => updateStatus()} />
+      </div>
+    </div>
+  </div>
+
   const Footer = () => <div style={footerStyle}>
     <Update  onClick={() => { 
       updateConfig()
@@ -322,6 +348,10 @@ function Items() {
             </div>
           </div>
         </div>
+
+        <br></br>
+
+        <RefreshBar />
 
 <ItemList />
 

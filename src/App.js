@@ -52,6 +52,15 @@ const UPDATE_CONFIG = gql`
   }
 `
 
+const UPDATE_STATUS = gql`
+  mutation {
+    updateStatus {
+      success
+      error
+    }
+  }
+`
+
 const DELETE_CONFIG = gql`
   mutation DeleteConfig($id: String) {
     deleteConfig(id: $id) {
@@ -118,6 +127,14 @@ function App() {
     updateConfig,
     // { loading: mutationLoading, error: mutationError }
   ] = useMutation(UPDATE_CONFIG, {
+    refetchQueries: [{ query: ALL_IN_ONE }],
+    awaitRefetchQueries: true
+  })
+
+  const [
+    updateStatus,
+    // { loading: mutationLoading, error: mutationError }
+  ] = useMutation(UPDATE_STATUS, {
     refetchQueries: [{ query: ALL_IN_ONE }],
     awaitRefetchQueries: true
   })
@@ -357,9 +374,21 @@ function App() {
   <div>
     <Banner />
     <br></br>
+    
     <div className="container-fluid">
         <div className="row">
         <ItemList />
+
+        <div className='col-sm-4' key='addRecord'>
+          <div style={boxStyle}>
+              <div style={placeHolderCenterStyle}>
+                <span role="img" aria-label="plus" onClick={() => updateStatus()}>UPDATE STATUS</span>)
+              </div>
+          </div>
+        </div>
+
+
+
         <div className='col-sm-4' key='addRecord'>
           <div style={boxStyle}>
               <div style={placeHolderCenterStyle}>
