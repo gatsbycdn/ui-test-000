@@ -281,7 +281,7 @@ function Items() {
             deleteConfig({ variables: { id: item['id'] }}) 
             refetch()}}/>
         </div>
-
+// after 'ps'
       default:
         return <div>
           { (item['status']==='online') ? <CheckCircle style={caseLeft}/> : <Warning style={caseLeft}/> }
@@ -298,7 +298,8 @@ function Items() {
 
   const ItemList = () => Array.from(dataAll.configElse)
 // to filter private network
-  .filter( obj => isNaN(Number(obj['name'].slice(1,2))) === false )
+// isNaN(Number(obj['name'].slice(1,2)))
+  .filter( obj => (obj['name'].split('-').length > 3) === true )
   .map((obj, index) => 
     <div className='col-md-7' key={(obj['id']) || index }>
       <div style={boxStyle}>
@@ -311,7 +312,11 @@ function Items() {
   const RefreshBar = () => <div className='col-md-7' key='updateStatus'>
     <div style={boxStyle}>
       <div style={caseCenter}>
-        <Refresh role="img" aria-label="plus" onClick={() => updateStatus()} />
+        <Refresh role="img" aria-label="plus" onClick={() => {
+          updateStatus()
+          setTimeout(refetch,50)
+          setClickStatus(null)
+        }} />
       </div>
     </div>
   </div>
