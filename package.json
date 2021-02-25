@@ -15,13 +15,11 @@
     "dotenv": "^8.2.0",
     "fontsource-roboto": "^3.0.3",
     "graphql": "^15.3.0",
-    "mongodb": "^3.6.1",
-    "mongodb-client-encryption": "^1.1.0",
     "node-fetch": "^2.6.1",
     "react": "^16.13.1",
     "react-app-rewired": "^2.1.6",
     "react-dom": "^16.13.1",
-    "react-scripts": "^3.4.3"
+    "react-scripts": "^4.0.3"
   },
   "scripts": {
     "start": "react-app-rewired start",
