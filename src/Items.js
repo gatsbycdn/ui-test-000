@@ -1,13 +1,14 @@
 import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client'
-import { ArrowUpward, AddBox, Delete, ExitToApp, Update, DeleteForever, Flag, MoreVert, Speed, Warning, CheckCircle, Launch, Info, Refresh } from '@material-ui/icons';
+import { ArrowUpward, AddBox, Delete, ExitToApp, Update, DeleteForever, Flag, MoreVert, Speed, Warning, CheckCircle, FlightTakeoff, Info, Refresh, CloudQueue, CloudOff } from '@material-ui/icons';
 // import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 /* import Button from '@material-ui/core/Button';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem'; */
 import IconButton from '@material-ui/core/IconButton';
+import ReactCountryFlag from "react-country-flag";
 
 const GET_ITEMS = gql`
   query {
@@ -261,7 +262,7 @@ function Items() {
       default:
         return <div>
           <Flag style={caseLeft} />
-          <span style={caseCenter} >{v2Address}</span>
+          <span style={caseCenter} >{dataAll.config.ps}</span>
           <MoreVert style={caseRight} onClick={() => setClickStatus('topCases')}/>
         </div>
     }
@@ -271,27 +272,40 @@ function Items() {
     switch(param) {
       case item.id:
         return <div>
+          <div><span style={caseCenter} onClick={() => setClickStatus(null)}>{item.address}</span></div>
+          <div style={caseCenter}>
           <Delete style={caseLeft} onClick={() => {
             deleteConfig({ variables: { id: item['id'] }})
             refetch()}}/>
-          <span style={caseCenter} onClick={() => setClickStatus(null)}>{item.ip}</span>
+          
           <DeleteForever style={caseRight} onClick={() => {
             console.log(item['id'])
             removeDNSRecord({ variables: { id: item['id'] }})
             deleteConfig({ variables: { id: item['id'] }}) 
-            refetch()}}/>
+            refetch()}}/></div>
         </div>
+
 // after 'ps'
+// <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ip']}</span>
       default:
         return <div>
-          { (item['status']==='online') ? <CheckCircle style={caseLeft}/> : <Warning style={caseLeft}/> }
-          <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ps'].split('-').slice(-3).join('-')}</span>
-          <Launch style={caseRight}
-            onClick={() => { 
-            alterAddress({ variables: { address: item['address'] }})
-            setTimeout(refetch,50)
-            }
-          }/>
+          <div>
+            {(item['ps'].split('-')[6].slice(-2)==='cf') ? <CloudQueue style={caseLeft} /> : <CloudOff style={caseLeft} /> }
+            {item['ps'].split('-').splice(-3).join('-')}
+            <span style={caseRight}><ReactCountryFlag countryCode={item['ps'].split('-')[5]} onClick={() => setClickStatus(item.ip)} svg /></span>
+          </div>
+          <div>
+            { (item['status']==='online') ? <CheckCircle style={caseLeft}/> : <Warning style={caseLeft}/> }            
+            <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ip']}</span>                       
+            <FlightTakeoff style={caseRight}
+              onClick={() => { 
+              alterAddress({ variables: { address: item['address'] }})
+              setTimeout(refetch,50)
+              }
+            }/>
+
+
+          </div>
         </div>
     }
   }
