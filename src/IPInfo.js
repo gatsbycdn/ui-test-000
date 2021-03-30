@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
 import { useQuery, gql} from '@apollo/client';
 import { Home, Public, Info } from '@material-ui/icons';
+//import { red } from '@material-ui/core/colors';
 
 const IP_INFO = gql`
   query {
@@ -81,6 +82,8 @@ function IPInfo() {
     textAlign: "center"
   }
 
+  const myHome = {...caseLeft}
+
   const banner = (param) => {
     switch(param) {
       case 'remote':
@@ -109,7 +112,7 @@ function IPInfo() {
 
       default:
         return <div>
-          <Home style={caseLeft} onClick={() => setClickStatus('local')} />
+          <Home style={myHome} onClick={() => setClickStatus('local')} />
           <span style={caseCenter} onClick={() => refetch()}>{dataAll.proxyIP.ip}</span>
           <Info style={caseRight} onClick={() => setClickStatus('remoteInfo')}/>
         </div>

@@ -9,6 +9,8 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem'; */
 import IconButton from '@material-ui/core/IconButton';
 import ReactCountryFlag from "react-country-flag";
+import { orange } from '@material-ui/core/colors';
+import { red } from '@material-ui/core/colors';
 
 const GET_ITEMS = gql`
   query {
@@ -182,7 +184,6 @@ function Items() {
     margin: 10,
     backgroundColor: "white",
     WebkitFilter: "drop-shadow(0px 0px 4px #666)",
-    color: "black",
     fontSize: "1rem",
     textAlign: "center",
     fontFamily: "Arial",
@@ -197,7 +198,6 @@ function Items() {
     width: "100%",
     backgroundColor: "white",
     WebkitFilter: "drop-shadow(0px 0px 1px #666)",
-    color: "black",
     textAlign: "center",
     border: "1px",
     padding: 5,
@@ -239,6 +239,11 @@ function Items() {
     textAlign: "center"
   }
 
+  const cfIcon = {...caseRight, ...{color: orange[500], size: "small"}}
+  const flagIcon = {...caseLeft, ...{color: red[200]}}
+
+  // const myorange = { color: orange[500] }
+
   const v2Address = (dataAll.config && dataAll.config.address) ? dataAll.config.address : `Loading...`
 
   const banner = (param) => {
@@ -261,7 +266,7 @@ function Items() {
 
       default:
         return <div>
-          <Flag style={caseLeft} />
+          <Flag style={flagIcon} />
           <span style={caseCenter} >{dataAll.config.ps}</span>
           <MoreVert style={caseRight} onClick={() => setClickStatus('topCases')}/>
         </div>
@@ -290,12 +295,15 @@ function Items() {
       default:
         return <div>
           <div>
-            {(item['ps'].split('-')[6].slice(-2)==='cf') ? <CloudQueue style={caseLeft} /> : <CloudOff style={caseLeft} /> }
+            <span style={caseLeft}><ReactCountryFlag countryCode={item['ps'].split('-')[5]} onClick={() => setClickStatus(item.ip)} svg /></span>
+            
             {item['ps'].split('-').splice(-3).join('-')}
-            <span style={caseRight}><ReactCountryFlag countryCode={item['ps'].split('-')[5]} onClick={() => setClickStatus(item.ip)} svg /></span>
+            
+            {(item['ps'].split('-')[6].slice(-2)==='cf') ? <CloudQueue style={cfIcon}/> : <CloudOff color="disabled" style={caseRight} /> }
+            
           </div>
           <div>
-            { (item['status']==='online') ? <CheckCircle style={caseLeft}/> : <Warning style={caseLeft}/> }            
+            { (item['status']==='online') ? <CheckCircle fontSize="small" style={caseLeft}/> : <Warning style={caseLeft}/> }            
             <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ip']}</span>                       
             <FlightTakeoff style={caseRight}
               onClick={() => { 
