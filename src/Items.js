@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import React, { useState, useEffect } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client'
-import { ArrowUpward, AddBox, Delete, ExitToApp, Update, DeleteForever, Flag, MoreVert, Speed, Warning, CheckCircle, FlightTakeoff, Info, Refresh, CloudQueue, CloudOff } from '@material-ui/icons';
+import { ArrowUpward, AddBox, Delete, ExitToApp, Update, DeleteForever, Flag, Link, MoreVert, Speed, Warning, CheckCircle, FlightTakeoff, Info, Refresh, CloudQueue, CloudOff } from '@material-ui/icons';
 // import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 /* import Button from '@material-ui/core/Button';
@@ -18,24 +18,20 @@ const GET_ITEMS = gql`
       config {
         name
         address
-        alterId
         id
         ip
-        path
         ps
-        vid
         status
+        proxied
       }
       configElse {
         name
         address
-        alterId
         id
         ip
-        path
         ps
-        vid
         status
+        proxied
       }
     }
   }
@@ -88,15 +84,13 @@ const REMOVE_DNS_RECORD = gql`
 const ADD_DNS_RECORD = gql`
   mutation AddDNSRecord($ps: String, $ip: String) {
     addDNSRecord(ps: $ps, ip: $ip) {
-      result {
-        id
-      }
-      success
-      errors {
-        code
-        message
-      }
-      id 
+      name
+      address
+      id
+      ip
+      ps
+      status
+      proxied
     }
   }
 `
@@ -111,6 +105,30 @@ const ALTER_CONFIG_ADDRESS = gql`
   }
 `
 
+const PROXIFY = gql`
+  mutation Proxify($id: String, $proxied: Boolean) {
+    proxify(id: $id, proxied: $proxied) {
+      name
+      address
+      id
+      ip
+      ps
+      status
+      proxied
+    }
+  }`
+/*
+const PROXIFY = gql`
+  mutation Proxify($id: String) {
+    proxify(id: $id) {
+      success
+      error
+      proxied
+    }
+  }`*/
+
+
+
 const UPDATE_STATUS = gql`
   mutation {
     updateStatus {
@@ -120,11 +138,19 @@ const UPDATE_STATUS = gql`
   }
 `
 
+const UPDATE_STATUS_ONE = gql`
+  mutation UpdateStatusOne($address: String) {
+    updateStatusOne(address: $address) {
+      success
+      error
+    }
+  }
+`
 function Items() {
   dotenv.config()
   console.log('rendering...')
 
-  const { error, loading, data, refetch } = useQuery(GET_ITEMS)
+  const { error: queryError, loading: queryLoading, data, refetch } = useQuery(GET_ITEMS)
   const [
     updateConfig,
     // { loading: mutationLoading, error: mutationError }
@@ -137,6 +163,22 @@ function Items() {
     updateStatus,
     // { loading: mutationLoading, error: mutationError }
   ] = useMutation(UPDATE_STATUS, {
+    refetchQueries: [{ query: GET_ITEMS }],
+    awaitRefetchQueries: true
+  })
+
+  const [
+    updateStatusOne,
+    // { loading: mutationLoading, error: mutationError }
+  ] = useMutation(UPDATE_STATUS_ONE, {
+    refetchQueries: [{ query: GET_ITEMS }],
+    awaitRefetchQueries: true
+  })
+
+  const [
+    proxify, // { loading: mutationLoading, error: mutationError}
+    // { loading: mutationLoading, error: mutationError }
+  ] = useMutation(PROXIFY, {
     refetchQueries: [{ query: GET_ITEMS }],
     awaitRefetchQueries: true
   })
@@ -163,16 +205,16 @@ function Items() {
     setClickStatus(null)
   }, [data])
 
-  if (loading) return null;
-  if (error) return (
+  if (queryLoading) return null;
+  if (queryError) return (
     
     <div
     onClick={() => { 
-      alterAddress({ variables: { address: 'luochengqi.com' }})
+      alterAddress({ variables: { address: '103-73-67-105-hosthatch-hk-central.gatsbycdn.com' }})
       setTimeout(refetch,50)
       }
     }>
-    <div>`Error! ${error}`</div>
+    <div>`Error! ${queryError}`</div>
     <span role="img" aria-label="rocket">🚀</span>
   </div>
   );
@@ -272,17 +314,17 @@ function Items() {
         </div>
     }
   }
-
+// <div><span style={caseCenter} onClick={() => setClickStatus(null)}>{item.address}</span></div>
   const itemBar = (item, param) => {
     switch(param) {
       case item.id:
         return <div>
-          <div><span style={caseCenter} onClick={() => setClickStatus(null)}>{item.address}</span></div>
+          <div onClick={() => setClickStatus(null)}>{item['address']}</div>
           <div style={caseCenter}>
           <Delete style={caseLeft} onClick={() => {
             deleteConfig({ variables: { id: item['id'] }})
             refetch()}}/>
-          
+          <span style={caseCenter} onClick={() => setClickStatus(null)}><span><a href={'https://' + item.address}><Link /></a></span></span>
           <DeleteForever style={caseRight} onClick={() => {
             console.log(item['id'])
             removeDNSRecord({ variables: { id: item['id'] }})
@@ -292,18 +334,30 @@ function Items() {
 
 // after 'ps'
 // <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ip']}</span>
+// {(item['ps'].split('-')[6].slice(-2)==='cf') ? <CloudQueue style={cfIcon}/> : <CloudOff color="disabled" style={caseRight} /> }
       default:
         return <div>
           <div>
             <span style={caseLeft}><ReactCountryFlag countryCode={item['ps'].split('-')[5]} onClick={() => setClickStatus(item.ip)} svg /></span>
             
-            {item['ps'].split('-').splice(-3).join('-')}
+            <span>{item['ps'].split('-').splice(-3).join('-')}</span>
             
-            {(item['ps'].split('-')[6].slice(-2)==='cf') ? <CloudQueue style={cfIcon}/> : <CloudOff color="disabled" style={caseRight} /> }
+            <span id={item.id} onClick={() => {
+                proxify({ variables: { id: item['id'], proxied: (!item['proxied']) }})
+              }
+            }> 
+              {(item['proxied']) ? <CloudQueue style={cfIcon}/> : <CloudOff color="disabled" style={caseRight} /> } 
+            </span>
             
           </div>
           <div>
-            { (item['status']==='online') ? <CheckCircle fontSize="small" style={caseLeft}/> : <Warning style={caseLeft}/> }            
+            <span style={caseLeft} onClick={() => 
+              {
+                console.log(item['address'])
+                updateStatusOne({ variables: { address: item['address'] }})
+              }}>
+                { (item['status']==='online') ? <CheckCircle fontSize="small" /> : <Warning/> }  
+            </span>          
             <span style={caseCenter} onClick={() => setClickStatus(item.id)}>{item['ip']}</span>                       
             <FlightTakeoff style={caseRight}
               onClick={() => { 
